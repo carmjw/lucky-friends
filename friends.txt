@@ -3,7 +3,7 @@
 # Under it, put one trainer name per line. Capitals don't matter.
 # Right under each [name], fill in the trainer code after "code =" (12 digits, spaces are fine).
 # Lines starting with # are ignored. Save the file and the page updates.
-
+sound = fanfare
 [carmjw]
 code = 4119 0126 5225
 000Willisser000
