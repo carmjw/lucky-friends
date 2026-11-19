@@ -61,6 +61,8 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
 .sugg[hidden] { display: none; }
 .sugg button { font: 700 .92rem var(--font-body); background: var(--accent-soft); color: var(--ink); border: 2px solid var(--line); border-radius: 999px; padding: .3rem .8rem; cursor: pointer; overflow-wrap: anywhere; }
 .sugg button:hover { border-color: var(--accent); }
+.soundbtn { display: inline-block; margin-top: .7rem; padding: .2rem 0; background: none; border: none; color: var(--muted); font: 700 .9rem var(--font-body); text-decoration: underline; cursor: pointer; }
+.soundbtn[hidden] { display: none; }
 .foot { text-align: center; color: var(--muted); font-size: .85rem; margin: 0; }
 .err { color: #b3261e; font-weight: 700; margin: .9rem 0 0; }
 @media (prefers-color-scheme: dark) { .err { color: #ff8a80; } }
@@ -80,6 +82,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       <button type="submit">Check</button>
     </form>
     <ul class="sugg" id="sugg" aria-label="Name suggestions" hidden></ul>
+    <button type="button" class="soundbtn" id="soundbtn" aria-pressed="true" hidden>Sound on</button>
     <div id="results" aria-live="polite"></div>
   </section>
   <p class="foot" id="foot"></p>
@@ -87,7 +90,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
 <script>
 (function () {
   var SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.5 6.2 6.5 2.5-6.5 2.6L12 20l-2.5-6.2L3 11.2l6.5-2.5z"/></svg>';
-  var accounts = [], loaded = false;
+  var accounts = [], loaded = false, settings = { sound: 'chime' };
   var box = document.getElementById('results');
 
   function norm(s) { return String(s || '').normalize('NFKC').toLowerCase().replace(/^@+/, '').replace(/\s+/g, ' ').trim(); }
@@ -99,12 +102,55 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       if (!t || t.charAt(0) === '#') return;
       var m = t.match(/^\[(.+)\]$/);
       if (m) { cur = { name: m[1].trim(), friends: [], code: '' }; out.push(cur); }
+      else if (!cur && /^sound\s*[=:]/i.test(t)) settings.sound = t.replace(/^sound\s*[=:]/i, '').trim().toLowerCase();
       else if (cur && /^code\s*[=:]/i.test(t)) cur.code = t.replace(/^code\s*[=:]/i, '').trim();
       else if (cur) cur.friends.push(t);
     });
     return out;
   }
 
+
+  var SOUNDS = {"chime":[[1046.5,0,0.9,"sine",0.35],[1318.5,0.12,0.9,"sine",0.35],[1568,0.24,0.9,"sine",0.35],[2093,0.36,1.3,"sine",0.35]],"sparkle":[[2093,0,0.28,"triangle",0.22],[2637,0.07,0.28,"triangle",0.22],[3136,0.14,0.28,"triangle",0.22],[2349,0.21,0.28,"triangle",0.22],[3520,0.28,0.28,"triangle",0.22],[2793,0.35,0.28,"triangle",0.22],[4186,0.42,0.6,"triangle",0.22]],"pop":[[784,0,0.14,"triangle",0.4],[1175,0.09,0.28,"triangle",0.4]],"fanfare":[[523,0,0.15,"triangle",0.3],[523,0.17,0.15,"triangle",0.3],[523,0.34,0.15,"triangle",0.3],[659,0.51,0.2,"triangle",0.3],[784,0.7,0.9,"triangle",0.3],[1046,0.7,0.9,"triangle",0.2]],"harp":[[523,0,1.3,"sine",0.3],[659,0.1,1.3,"sine",0.3],[784,0.2,1.3,"sine",0.3],[1046,0.3,1.3,"sine",0.3],[1318,0.4,1.3,"sine",0.3],[1568,0.5,1.6,"sine",0.3]]};
+  var audioCtx = null, muted = false;
+  try { muted = localStorage.getItem('lfc-mute') === '1'; } catch (e) {}
+  function playNotes(notes) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var t0 = audioCtx.currentTime + 0.02;
+      notes.forEach(function (n) {
+        var o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = t0 + n[1];
+        o.type = n[3]; o.frequency.value = n[0];
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(n[4], t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + n[2]);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(t); o.stop(t + n[2] + 0.05);
+      });
+    } catch (e) {}
+  }
+  function playSound() {
+    var name = settings.sound || 'chime';
+    if (muted || name === 'off' || name === 'none') return;
+    if (SOUNDS[name]) { playNotes(SOUNDS[name]); return; }
+    if (/^[\w. \-]+\.(mp3|wav|ogg|m4a)$/i.test(name)) {
+      try { var a = new Audio(encodeURI(name)); a.volume = 0.8; var pr = a.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+      return;
+    }
+    playNotes(SOUNDS.chime);
+  }
+  function initSoundBtn() {
+    var btn = document.getElementById('soundbtn');
+    var off = settings.sound === 'off' || settings.sound === 'none';
+    btn.hidden = off;
+    function label() { btn.textContent = muted ? 'Sound off' : 'Sound on'; btn.setAttribute('aria-pressed', muted ? 'false' : 'true'); }
+    label();
+    btn.addEventListener('click', function () {
+      muted = !muted; label();
+      try { localStorage.setItem('lfc-mute', muted ? '1' : '0'); } catch (e) {}
+    });
+  }
 
   function confetti() {
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -173,7 +219,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       ul.append(li);
     });
     box.append(ul);
-    if (celebrate && hits && hits.some(Boolean)) confetti();
+    if (celebrate && hits && hits.some(Boolean)) { confetti(); playSound(); }
   }
 
   var sugg = document.getElementById('sugg'), inp = document.getElementById('trainer');
@@ -211,7 +257,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
     var lm = r.headers.get('last-modified');
     return r.text().then(function (t) { return { t: t, lm: lm }; });
   }).then(function (res) {
-    accounts = parse(res.t); loaded = accounts.length > 0;
+    accounts = parse(res.t); loaded = accounts.length > 0; initSoundBtn();
     if (res.lm) { var d = new Date(res.lm); if (!isNaN(d)) document.getElementById('foot').textContent = 'List updated ' + d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) + '.'; }
     show('', '');
   }).catch(function () { loaded = false; show('', ''); });
