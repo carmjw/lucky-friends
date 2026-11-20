@@ -90,18 +90,18 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
 <script>
 (function () {
   var SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.5 6.2 6.5 2.5-6.5 2.6L12 20l-2.5-6.2L3 11.2l6.5-2.5z"/></svg>';
-  var accounts = [], loaded = false, settings = { sound: 'chime' };
+  var accounts = [], loaded = false, pastList = [], settings = { sound: 'chime' };
   var box = document.getElementById('results');
 
   function norm(s) { return String(s || '').normalize('NFKC').toLowerCase().replace(/^@+/, '').replace(/\s+/g, ' ').trim(); }
 
   function parse(text) {
-    var out = [], cur = null;
+    var out = [], cur = null; pastList = [];
     text.split(/\r?\n/).forEach(function (line) {
       var t = line.trim();
       if (!t || t.charAt(0) === '#') return;
       var m = t.match(/^\[(.+)\]$/);
-      if (m) { cur = { name: m[1].trim(), friends: [], code: '' }; out.push(cur); }
+      if (m) { cur = { name: m[1].trim(), friends: [], code: '' }; if (/^(past|former)$/i.test(cur.name)) pastList = cur.friends; else out.push(cur); }
       else if (!cur && /^sound\s*[=:]/i.test(t)) settings.sound = t.replace(/^sound\s*[=:]/i, '').trim().toLowerCase();
       else if (cur && /^code\s*[=:]/i.test(t)) cur.code = t.replace(/^code\s*[=:]/i, '').trim();
       else if (cur) cur.friends.push(t);
@@ -225,7 +225,9 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
   var sugg = document.getElementById('sugg'), inp = document.getElementById('trainer');
   function allNames() {
     var seen = {}, out = [];
-    accounts.forEach(function (a) { a.friends.forEach(function (f) { var k = norm(f); if (!seen[k]) { seen[k] = 1; out.push(f); } }); });
+    function add(f) { var k = norm(f); if (!seen[k]) { seen[k] = 1; out.push(f); } }
+    accounts.forEach(function (a) { a.friends.forEach(add); });
+    pastList.forEach(add);
     return out;
   }
   inp.addEventListener('input', function () {

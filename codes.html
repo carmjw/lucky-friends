@@ -58,7 +58,7 @@ button { font: 700 .92rem var(--font-body); background: var(--accent); color: va
       var t = line.trim();
       if (!t || t.charAt(0) === '#') return;
       var m = t.match(/^\[(.+)\]$/);
-      if (m) { cur = { name: m[1].trim(), code: '' }; out.push(cur); }
+      if (m) { if (/^(past|former)$/i.test(m[1].trim())) cur = null; else { cur = { name: m[1].trim(), code: '' }; out.push(cur); } }
       else if (cur && /^code\s*[=:]/i.test(t)) cur.code = t.replace(/^code\s*[=:]/i, '').trim();
     });
     return out;
