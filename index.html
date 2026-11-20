@@ -90,7 +90,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
 <script>
 (function () {
   var SPARK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.5 6.2 6.5 2.5-6.5 2.6L12 20l-2.5-6.2L3 11.2l6.5-2.5z"/></svg>';
-  var accounts = [], loaded = false, pastList = [], settings = { sound: 'chime', sadsound: 'trombone' };
+  var accounts = [], loaded = false, pastList = [], settings = { sound: 'chime' };
   var box = document.getElementById('results');
 
   function norm(s) { return String(s || '').normalize('NFKC').toLowerCase().replace(/^@+/, '').replace(/\s+/g, ' ').trim(); }
@@ -102,7 +102,6 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       if (!t || t.charAt(0) === '#') return;
       var m = t.match(/^\[(.+)\]$/);
       if (m) { cur = { name: m[1].trim(), friends: [], code: '' }; if (/^(past|former)$/i.test(cur.name)) pastList = cur.friends; else out.push(cur); }
-      else if (!cur && /^sad-sound\s*[=:]/i.test(t)) settings.sadsound = t.replace(/^sad-sound\s*[=:]/i, '').trim().toLowerCase();
       else if (!cur && /^sound\s*[=:]/i.test(t)) settings.sound = t.replace(/^sound\s*[=:]/i, '').trim().toLowerCase();
       else if (cur && /^code\s*[=:]/i.test(t)) cur.code = t.replace(/^code\s*[=:]/i, '').trim();
       else if (cur) cur.friends.push(t);
@@ -111,8 +110,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
   }
 
 
-  var SOUNDS = {"chime":[[1046.5,0,0.9,"sine",0.35],[1318.5,0.12,0.9,"sine",0.35],[1568,0.24,0.9,"sine",0.35],[2093,0.36,1.3,"sine",0.35]],"sparkle":[[2093,0,0.28,"triangle",0.22],[2637,0.07,0.28,"triangle",0.22],[3136,0.14,0.28,"triangle",0.22],[2349,0.21,0.28,"triangle",0.22],[3520,0.28,0.28,"triangle",0.22],[2793,0.35,0.28,"triangle",0.22],[4186,0.42,0.6,"triangle",0.22]],"pop":[[784,0,0.14,"triangle",0.4],[1175,0.09,0.28,"triangle",0.4]],"fanfare":[[523,0,0.15,"triangle",0.3],[523,0.17,0.15,"triangle",0.3],[523,0.34,0.15,"triangle",0.3],[659,0.51,0.2,"triangle",0.3],[784,0.7,0.9,"triangle",0.3],[1046,0.7,0.9,"triangle",0.2]],"harp":[[523,0,1.3,"sine",0.3],[659,0.1,1.3,"sine",0.3],[784,0.2,1.3,"sine",0.3],[1046,0.3,1.3,"sine",0.3],[1318,0.4,1.3,"sine",0.3],[1568,0.5,1.6,"sine",0.3]],"levelup":[[523,0,0.1,"square",0.14],[659,0.08,0.1,"square",0.14],[784,0.16,0.1,"square",0.14],[1046,0.24,0.1,"square",0.14],[1318,0.32,0.1,"square",0.14],[1568,0.4,0.55,"square",0.14]],"coin":[[988,0,0.08,"square",0.14],[1319,0.08,0.65,"square",0.14]],"magic":[[400,0,0.6,"triangle",0.25,1600],[2093,0.45,0.3,"triangle",0.18],[2637,0.55,0.3,"triangle",0.18],[3136,0.65,0.3,"triangle",0.18],[4186,0.75,0.6,"triangle",0.18]],"party":[[523,0,0.14,"triangle",0.22],[659,0,0.14,"triangle",0.22],[784,0,0.14,"triangle",0.22],[523,0.2,0.14,"triangle",0.22],[659,0.2,0.14,"triangle",0.22],[784,0.2,0.14,"triangle",0.22],[659,0.4,0.9,"triangle",0.22],[784,0.4,0.9,"triangle",0.22],[1046,0.4,0.9,"triangle",0.22]]};
-  var SAD = {"trombone":[[466,0,0.35,"sawtooth",0.35],[440,0.4,0.35,"sawtooth",0.35],[415,0.8,0.35,"sawtooth",0.35],[392,1.2,1.3,"sawtooth",0.35,300]],"whomp":[[196,0,0.4,"sawtooth",0.22,170],[147,0.5,0.9,"sawtooth",0.22,105]],"aww":[[880,0,1.0,"triangle",0.3,330]],"buzzer":[[120,0,0.7,"sawtooth",0.22],[127,0,0.7,"sawtooth",0.18]],"deflate":[[600,0,1.2,"sawtooth",0.2,120]],"gameover":[[392,0,0.2,"square",0.14],[330,0.2,0.2,"square",0.14],[262,0.4,0.2,"square",0.14],[196,0.6,0.8,"square",0.14,170]],"oops":[[523,0,0.5,"sine",0.3],[415,0.45,1.3,"sine",0.3]]};
+  var SOUNDS = {"chime":[[1046.5,0,0.9,"sine",0.35],[1318.5,0.12,0.9,"sine",0.35],[1568,0.24,0.9,"sine",0.35],[2093,0.36,1.3,"sine",0.35]],"sparkle":[[2093,0,0.28,"triangle",0.22],[2637,0.07,0.28,"triangle",0.22],[3136,0.14,0.28,"triangle",0.22],[2349,0.21,0.28,"triangle",0.22],[3520,0.28,0.28,"triangle",0.22],[2793,0.35,0.28,"triangle",0.22],[4186,0.42,0.6,"triangle",0.22]],"pop":[[784,0,0.14,"triangle",0.4],[1175,0.09,0.28,"triangle",0.4]],"fanfare":[[523,0,0.15,"triangle",0.3],[523,0.17,0.15,"triangle",0.3],[523,0.34,0.15,"triangle",0.3],[659,0.51,0.2,"triangle",0.3],[784,0.7,0.9,"triangle",0.3],[1046,0.7,0.9,"triangle",0.2]],"harp":[[523,0,1.3,"sine",0.3],[659,0.1,1.3,"sine",0.3],[784,0.2,1.3,"sine",0.3],[1046,0.3,1.3,"sine",0.3],[1318,0.4,1.3,"sine",0.3],[1568,0.5,1.6,"sine",0.3]]};
   var audioCtx = null, muted = false;
   try { muted = localStorage.getItem('lfc-mute') === '1'; } catch (e) {}
   function playNotes(notes) {
@@ -123,30 +121,28 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       var t0 = audioCtx.currentTime + 0.02;
       notes.forEach(function (n) {
         var o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = t0 + n[1];
-        o.type = n[3]; o.frequency.setValueAtTime(n[0], t); if (n[5]) o.frequency.exponentialRampToValueAtTime(n[5], t + n[2]);
+        o.type = n[3]; o.frequency.value = n[0];
         g.gain.setValueAtTime(0.0001, t);
         g.gain.linearRampToValueAtTime(n[4], t + 0.01);
         g.gain.exponentialRampToValueAtTime(0.0001, t + n[2]);
-        var tail = o; if (n[3] === 'sawtooth' || n[3] === 'square') { var lpf = audioCtx.createBiquadFilter(); lpf.type = 'lowpass'; lpf.frequency.value = n[3] === 'square' ? 3000 : 2200; o.connect(lpf); tail = lpf; }
-        tail.connect(g); g.connect(audioCtx.destination);
+        o.connect(g); g.connect(audioCtx.destination);
         o.start(t); o.stop(t + n[2] + 0.05);
       });
     } catch (e) {}
   }
-  function playChoice(name, table, fallback) {
+  function playSound() {
+    var name = settings.sound || 'chime';
     if (muted || name === 'off' || name === 'none') return;
-    if (table[name]) { playNotes(table[name]); return; }
+    if (SOUNDS[name]) { playNotes(SOUNDS[name]); return; }
     if (/^[\w. \-]+\.(mp3|wav|ogg|m4a)$/i.test(name)) {
       try { var a = new Audio(encodeURI(name)); a.volume = 0.8; var pr = a.play(); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
       return;
     }
-    playNotes(table[fallback]);
+    playNotes(SOUNDS.chime);
   }
-  function playSound() { playChoice(settings.sound || 'chime', SOUNDS, 'chime'); }
-  function playSad() { playChoice(settings.sadsound || 'trombone', SAD, 'trombone'); }
   function initSoundBtn() {
     var btn = document.getElementById('soundbtn');
-    var off = (settings.sound === 'off' || settings.sound === 'none') && (settings.sadsound === 'off' || settings.sadsound === 'none');
+    var off = settings.sound === 'off' || settings.sound === 'none';
     btn.hidden = off;
     function label() { btn.textContent = muted ? 'Sound off' : 'Sound on'; btn.setAttribute('aria-pressed', muted ? 'false' : 'true'); }
     label();
@@ -223,7 +219,7 @@ button { font: 700 1rem var(--font-body); background: var(--accent); color: var(
       ul.append(li);
     });
     box.append(ul);
-    if (celebrate && hits) { if (hits.some(Boolean)) { confetti(); playSound(); } else playSad(); }
+    if (celebrate && hits && hits.some(Boolean)) { confetti(); playSound(); }
   }
 
   var sugg = document.getElementById('sugg'), inp = document.getElementById('trainer');
