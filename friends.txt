@@ -48,7 +48,6 @@ EngBKD22
 EngHEL3811
 EugeneTeoCH
 Fatalistica
-Fiery9937
 Goodpokemon68
 GregMcGregor666
 gundam7431
@@ -231,11 +230,11 @@ Roman4103
 code = 6851 7551 5408
 Ahlun118
 Alvin2Wood
+AndraSemesta
 Bronson2208
 brumcg
 Buzzoff2602
 Danyal2407
-Fiery9937
 highnz
 IrvingTing
 Jeremylim311
@@ -261,7 +260,6 @@ BillyDucky
 CremeBruleeeMT
 cuchan519
 DonChang1
-Fiery9937
 fishstory6
 GunnaWunna1
 iAmLimPeh
@@ -283,6 +281,7 @@ U9lyKw4n
 [past]
 Fastslacker
 jiajiezx
+Fiery9937
 FieryGo04
 Luiss1a
 Kirarara7152
