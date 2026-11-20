@@ -5,7 +5,7 @@
 # Lines starting with # are ignored. Save the file and the page updates.
 sound = fanfare
 volume = 100
-sad-volume = 70
+sad-volume = 80
 [carmjw]
 code = 4119 0126 5225
 000Willisser000
