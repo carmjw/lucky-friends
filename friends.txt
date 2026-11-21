@@ -228,7 +228,6 @@ Roman4103
 [pukeehunt]
 code = 6851 7551 5408
 Ahlun118
-Alvin2Wood
 AndraSemesta
 Bronson2208
 brumcg
